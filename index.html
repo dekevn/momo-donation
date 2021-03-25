@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Momo Donation</title>
+</head>
+
+<body>
+  Phone number: <input type="text" id="sdt" value="0"><br>
+  Money Amount: <input type="number" id="money" value="500" min="1"><br>
+  Slug: <input type="text" id="slug" value="nhu-chua-he-co-cuoc-chia-ly"><br>
+  <button type="button" onclick="donationMomo()">>>> Donate <<<</button>
+</body>
+<script>
+  function donationMomo() {
+    var phoneNum = document.getElementById('sdt').value;
+    var money = document.getElementById('money').value || 1;
+    var slug = document.getElementById('slug').value;
+    if (phoneNum && money && slug) {
+      fetch(`https://m.momo.vn:8443/__get/Donation/GetDonationDetailV2?slug=${slug}&userPhone=${phoneNum}`)
+        .then(res => res.json())
+        .then(dataUid => {
+          fetch("https://m.momo.vn:8443/__post/Donation/CreateTransByTokenV2", {
+            method: "POST",
+            headers: new Headers({
+              "content-type": "application/json;charset=UTF-8",
+            }),
+            body: JSON.stringify({
+              "totalOrder": parseInt(money,10),
+              "moneySource": 1,
+              "anonymous": false,
+              "userPhone": "",
+              "token": dataUid.Data.Uid
+            })
+          })
+            .then(res => res.json())
+            .then(dataTransToken => {
+              window.open(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`, "_blank");
+            });
+        });
+    }
+  }
+</script>
+
+</html>
