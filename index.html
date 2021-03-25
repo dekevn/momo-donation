@@ -10,6 +10,8 @@
   Money Amount: <input type="number" id="money" value="500" min="1"><br>
   Slug: <input type="text" id="slug" value="nhu-chua-he-co-cuoc-chia-ly"><br>
   <button type="button" onclick="donationMomo()">>>> Donate <<<</button>
+  <br>
+  B001
 </body>
 <script>
   function donationMomo() {
@@ -35,7 +37,9 @@
           })
             .then(res => res.json())
             .then(dataTransToken => {
-              window.open(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`, "_blank");
+              // fix on iOS/iMac
+              window.location.assign(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`);
+              // window.open(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`, "_blank");
             });
         });
     }
