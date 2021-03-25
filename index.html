@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Momo Donation</title>
+  <title>Momo Quick Donation</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Momo Quick Donation">
+  <base href="/">
+  <style>
+    .w-100 { width: 100%; }
+    .w-200px { width: 200px; }
+    .text-center { text-align: center; }
+    .h-50px { height: 50px; }
+  </style>
 </head>
 
-<body>
-  Phone number: <input type="text" id="sdt" value="0"><br>
-  Money Amount: <input type="number" id="money" value="500" min="1"><br>
-  Slug: <input type="text" id="slug" value="nhu-chua-he-co-cuoc-chia-ly"><br>
-  <button type="button" onclick="donationMomo()">>>> Donate <<<</button>
-  <br>
-  B001
+<body style="width: 100%" onload="getQueryParams()">
+  <table>
+    <tr>
+      <td>
+        Phone number:
+      </td>
+      <td class="w-200px">
+        <input type="text" id="sdt" value="0" class="w-100">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Money Amount:
+      </td>
+      <td class="w-200px">
+        <input type="number" id="money" value="500" min="1" class="w-100">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Slug:
+      </td>
+      <td class="w-200px">
+        <input type="text" id="slug" value="nhu-chua-he-co-cuoc-chia-ly" class="w-100">
+      </td>
+    </tr>
+    <tr>
+      <td colSpan="2">
+        <button type="button" onclick="donationMomo()" class="w-100 h-50px"><b>Quick Donation</b></button>
+      </td>
+    </tr>
+    <tr>
+      <td colSpan="2" class="text-center">
+        Revision 1
+      </td>
+    </tr>
+  </table>
 </body>
 <script>
+  function getQueryParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    document.getElementById('sdt').value = urlParams.get('p') || 0;
+    document.getElementById('money').value = urlParams.get('m') || 1;
+    document.getElementById('slug').value = urlParams.get('s') || 'nhu-chua-he-co-cuoc-chia-ly';
+  };
   function donationMomo() {
     var phoneNum = document.getElementById('sdt').value;
     var money = document.getElementById('money').value || 1;
@@ -28,7 +74,7 @@
               "content-type": "application/json;charset=UTF-8",
             }),
             body: JSON.stringify({
-              "totalOrder": parseInt(money,10),
+              "totalOrder": parseInt(money, 10),
               "moneySource": 1,
               "anonymous": false,
               "userPhone": "",
@@ -37,9 +83,7 @@
           })
             .then(res => res.json())
             .then(dataTransToken => {
-              // fix on iOS/iMac
               window.location.assign(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`);
-              // window.open(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`, "_blank");
             });
         });
     }
