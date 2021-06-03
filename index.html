@@ -43,7 +43,12 @@
     </tr>
     <tr>
       <td colSpan="2">
-        <button type="button" onclick="donationMomo()" class="w-100 h-50px"><b>Quick Donation</b></button>
+        <button type="button" onclick="donationMomo()" class="w-100 h-50px"><b>Donation</b></button>
+      </td>
+    </tr>
+    <tr>
+      <td colSpan="2">
+        <button type="button" onclick="donationMomoQuick()" class="w-100 h-50px"><b>Quick Donation</b></button>
       </td>
     </tr>
     <tr>
@@ -55,39 +60,74 @@
 </body>
 <script>
   function getQueryParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    document.getElementById('sdt').value = urlParams.get('p') || 0;
-    document.getElementById('money').value = urlParams.get('m') || 1;
-    document.getElementById('slug').value = urlParams.get('s') || 'nhu-chua-he-co-cuoc-chia-ly';
-  };
-  function donationMomo() {
-    var phoneNum = document.getElementById('sdt').value;
-    var money = document.getElementById('money').value || 1;
-    var slug = document.getElementById('slug').value;
-    if (phoneNum && money && slug) {
-      fetch(`https://m.momo.vn:8443/__get/Donation/GetDonationDetailV2?slug=${slug}&userPhone=${phoneNum}`)
-        .then(res => res.json())
-        .then(dataUid => {
-          fetch("https://m.momo.vn:8443/__post/Donation/CreateTransByTokenV2", {
-            method: "POST",
-            headers: new Headers({
-              "content-type": "application/json;charset=UTF-8",
-            }),
-            body: JSON.stringify({
-              "totalOrder": parseInt(money, 10),
-              "moneySource": 1,
-              "anonymous": false,
-              "userPhone": "",
-              "token": dataUid.Data.Uid
-            })
+  const urlParams = new URLSearchParams(window.location.search);
+  document.getElementById('sdt').value = urlParams.get('p') || 0;
+  document.getElementById('money').value = urlParams.get('m') || 1;
+  document.getElementById('slug').value = urlParams.get('s') || 'nhu-chua-he-co-cuoc-chia-ly';
+};
+function donationMomo() {
+  var phoneNum = document.getElementById('sdt').value;
+  var money = document.getElementById('money').value || 100;
+  var slug = document.getElementById('slug').value;
+  if (phoneNum && money && slug) {
+    fetch(`https://m.momo.vn:8443/__get/Donation/GetDonationDetailV2?slug=${slug}&userPhone=${phoneNum}`)
+      .then(res => res.json())
+      .then(dataUid => {
+        fetch("https://m.momo.vn:8443/__post/Donation/CreateTransByTokenV2", {
+          method: "POST",
+          headers: new Headers({
+            "content-type": "application/json;charset=UTF-8",
+          }),
+          body: JSON.stringify({
+            "totalOrder": parseInt(money, 10),
+            "moneySource": 1,
+            "anonymous": false,
+            "userPhone": "",
+            "token": dataUid.Data.Uid
           })
-            .then(res => res.json())
-            .then(dataTransToken => {
-              window.location.assign(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`);
-            });
-        });
-    }
+        })
+          .then(res => res.json())
+          .then(dataTransToken => {
+            window.location.assign(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`);
+          });
+      });
+  } else {
+    window.alert('Please input all required information!');
   }
+}
+
+function donationMomoQuick() {
+  var phoneNum = document.getElementById('sdt').value;
+  if (phoneNum) {
+    fetch(`https://m.momo.vn:8443/__get/Donation/LoadMoreDonationHome?count=1`)
+      .then(res => res.json())
+      .then(listSlug => {
+        fetch(`https://m.momo.vn:8443/__get/Donation/GetDonationDetailV2?slug=${listSlug.Data.Items[0].UrlRewrite}&userPhone=${phoneNum}`)
+          .then(res => res.json())
+          .then(dataUid => {
+            fetch("https://m.momo.vn:8443/__post/Donation/CreateTransByTokenV2", {
+              method: "POST",
+              headers: new Headers({
+                "content-type": "application/json;charset=UTF-8",
+              }),
+              body: JSON.stringify({
+                "totalOrder": 100,
+                "moneySource": 1,
+                "anonymous": false,
+                "userPhone": "",
+                "token": dataUid.Data.Uid
+              })
+            })
+              .then(res => res.json())
+              .then(dataTransToken => {
+                window.location.assign(`https://m.momo.vn/xac-nhan-dong-gop/${dataTransToken.Data}`);
+              });
+          });
+      });
+  } else {
+    window.alert('Please input your phone number!');
+  }
+}
 </script>
 
 </html>
